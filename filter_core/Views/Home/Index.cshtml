@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<ejs-grid id="Grid" dataSource="ViewBag.dataSource" toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" })" allowPaging="true" height="300">
+    <e-datamanager url="/Home/UrlDatasource" insertUrl="/Home/Insert" updateUrl="/Home/Update"  adaptor="UrlAdaptor"></e-datamanager>
+    <e-grid-editSettings allowAdding="true" allowEditing="true"></e-grid-editSettings>
+    <e-grid-columns>
+        <e-grid-column field="OrderID" width="110" isPrimaryKey=true></e-grid-column>
+        <e-grid-column field="CustomerID" headerText="CustomerID" width="110"></e-grid-column>
+        <e-grid-column field="ShipCountry"headerText="ShipCountry" edit="@(new {create = "create", read = "read", destroy = "destroy", write = "write"})" width="110"></e-grid-column>
+        <e-grid-column field="ShipName" width="110" edit="@(new {create = "createcity", read = "readcity", destroy = "destroycity", write = "writecity"})"> </e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script>
+    var countryElem;
+    var countryObj;
+    var stateElem;
+    var stateObj;
+
+    var country = [
+        { countryName: 'United States', countryId: '1' },
+        { countryName: 'Australia', countryId: '2' }
+    ];
+    var state = [
+        { stateName: 'New York', countryId: '1', stateId: '101' },
+        { stateName: 'Virginia ', countryId: '1', stateId: '102' },
+        { stateName: 'Washington', countryId: '1', stateId: '103' },
+        { stateName: 'Queensland', countryId: '2', stateId: '104' },
+        { stateName: 'Tasmania ', countryId: '2', stateId: '105' },
+        { stateName: 'Victoria', countryId: '2', stateId: '106' }
+    ];
+
+    function create() {
+        countryElem = document.createElement('input');
+        return countryElem;
+    };
+    function read() {
+        return countryObj.text;
+    };
+    function destroy() {
+        countryObj.destroy();
+    };
+    function write(args) {
+        countryObj = new ej.dropdowns.DropDownList({
+            dataSource: country,
+            fields: { value: 'countryId', text: 'countryName' },
+            value: args.rowData['ShipCountry'],
+            change: function () {
+                stateObj.enabled = true;
+                var tempQuery = new ej.data.Query().where('countryId', 'equal', countryObj.value);
+                stateObj.query = tempQuery;
+                stateObj.text = null;
+                stateObj.dataBind();
+            },
+            placeholder: 'Select a country',
+            floatLabelType: 'Never'
+        });
+        countryObj.appendTo(countryElem);
+    };
+    function createcity() {
+        stateElem = document.createElement('input');
+        return stateElem;
+    };
+    function readcity() {
+        return stateObj.text;
+    };
+    function destroycity() {
+        stateObj.destroy();
+    };
+    function writecity(args) {
+        stateObj = new ej.dropdowns.DropDownList({
+            dataSource: state,
+            fields: { value: 'stateId', text: 'stateName' },
+            enabled: false,
+            value: args.rowData['ShipName'],
+            placeholder: 'Select a state',
+            floatLabelType: 'Never'
+        });
+        stateObj.appendTo(stateElem);
+    }
+
+</script>
